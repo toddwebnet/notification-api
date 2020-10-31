@@ -1,0 +1,122 @@
+version: '3'
+
+services:
+
+  ### Reverse Proxy  ##########################################
+  proxy:
+    build:
+      context: ${DOCKER_PATH}/proxy
+      args:
+        - NGINX_DOCKERFILE_SOURCE=${NGINX_DOCKERFILE_SOURCE}
+    volumes:
+      - ${DATA_PATH_HOST}/logs/proxy:/var/log/nginx
+      - ${APP_PATH}/docker/_devops/ssl:/etc/nginx/ssl
+      - ${APP_PATH}/docker/_devops/nginx/proxy:/etc/nginx/sites-available
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - 'adminer'
+    networks:
+      network:
+        aliases:
+          - adminer.tpt.com
+          - courier.tpt.com
+
+  ### adminer develpment tools  ##########################################
+  adminer:
+    image: adminer
+    environment:
+      - ADMINER_DEFAULT_SERVER=mysql
+    restart: always
+    ports:
+      - 8091:8080
+    networks:
+      - network
+
+  ### beanstalkd and supervisor for queuing  ################################
+  beanstalkd:
+    build: ./beanstalkd
+    ports:
+      - "11300:11300"
+    privileged: true
+    networks:
+      - network
+
+  supervisor:
+    build:
+      context: ${DOCKER_PATH}/supervisor
+      args:
+        - PHP_DOCKERFILE_SOURCE=${PHP_DOCKERFILE_SOURCE}
+    volumes:
+      - ${APP_PATH}:/var/www
+      - ./supervisor/supervisord.d:/etc/supervisord.d
+    tty: true
+    networks:
+      - network
+
+  ### workspace (for tinkering)  ##########################################
+  workspace:
+    build:
+      context: ${DOCKER_PATH}/workspace
+      args:
+        - PHP_DOCKERFILE_SOURCE=${PHP_DOCKERFILE_SOURCE}
+    volumes:
+      - ${APP_PATH}:/var/www
+      - ${APP_PATH}/../:/var/projects
+    tty: true
+    networks:
+      - network
+
+  notiications-api:
+    build:
+      context: ${DOCKER_PATH}/nginx
+      args:
+        - PHP_UPSTREAM_CONTAINER=${PHP_UPSTREAM_CONTAINER}
+        - PHP_UPSTREAM_PORT=${PHP_UPSTREAM_PORT}
+    volumes:
+      - ${APP_PATH}/docker/_devops/nginx/notification-api.conf:/etc/nginx/sites-available/default.conf
+      - ./nginx/ssl/:/etc/nginx/ssl
+      - ${APP_PATH}:/var/www
+    ports:
+      - "8100:8100"
+    depends_on:
+      - php-fpm
+    networks:
+      - network
+
+  php-fpm:
+    build:
+      context: ${DOCKER_PATH}/php-fpm
+      args:
+        - PHP_FPM_DOCKERFILE_SOURCE=${PHP_FPM_DOCKERFILE_SOURCE}
+        - PHP_UPSTREAM_PORT=${PHP_UPSTREAM_PORT}
+    volumes:
+      - ${APP_PATH}:/var/www
+    expose:
+      - "9000"
+    networks:
+      - network
+
+  ### MySQL ################################################
+  mysql:
+    build:
+      context: ${DOCKER_PATH}/mysql
+      args:
+        - MYSQL_DOCKERFILE_SOURCE=${MYSQL_DOCKERFILE_SOURCE}
+        - TZ=${TIMEZONE}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
+      - ${MYSQL_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
+    ports:
+      - "${MYSQL_PORT}:3306"
+    networks:
+      - network
+
+networks:
+  network:
+    driver: ${NETWORKS_DRIVER}

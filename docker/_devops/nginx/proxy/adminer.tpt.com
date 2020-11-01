@@ -1,6 +1,6 @@
 server {
     listen 443 ssl;
-    server_name adminer.tpt.com;
+    server_name adminer.tpt.com adminer.acai.lan;
     location / {
         rewrite ^/pma(/.*)$ $1 break;
         proxy_pass http://host.docker.internal:8091;
@@ -20,7 +20,7 @@ server {
 server {
   listen 80;
   listen [::]:80;
-  server_name adminer.tpt.com;
+  server_name adminer.tpt.com adminer.acai.lan;
   location / {
       proxy_pass http://host.docker.internal:8091;
       proxy_http_version 1.1;

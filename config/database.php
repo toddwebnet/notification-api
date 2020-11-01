@@ -90,6 +90,12 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
+        'phpunit' => [
+            'driver' => 'sqlite',
+            'database' => storage_path() . '/phpunit.db',
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ]
 
     ],
 

@@ -22,9 +22,12 @@ class CourierApi extends BaseApi
             'cell-number' => $cell,
             'message' => $message
         ];
+        $headers = [
+            'token' => env('NOTIFICATION_API_TOKEN')
+        ];
         return json_decode(
             $this->getResponseContent(
-                $this->call($method, $endPoint, $params)
+                $this->call($method, $endPoint, $params, $headers)
             ), true
         );
     }

@@ -36,25 +36,25 @@ services:
       - network
 
   ### beanstalkd and supervisor for queuing  ################################
-  beanstalkd:
-    build: ./beanstalkd
-    ports:
-      - "11300:11300"
-    privileged: true
-    networks:
-      - network
-
-  supervisor:
-    build:
-      context: ${DOCKER_PATH}/supervisor
-      args:
-        - PHP_DOCKERFILE_SOURCE=${PHP_DOCKERFILE_SOURCE}
-    volumes:
-      - ${APP_PATH}:/var/www
-      - ./supervisor/supervisord.d:/etc/supervisord.d
-    tty: true
-    networks:
-      - network
+#  beanstalkd:
+#    build: ./beanstalkd
+#    ports:
+#      - "11300:11300"
+#    privileged: true
+#    networks:
+#      - network
+#
+#  supervisor:
+#    build:
+#      context: ${DOCKER_PATH}/supervisor
+#      args:
+#        - PHP_DOCKERFILE_SOURCE=${PHP_DOCKERFILE_SOURCE}
+#    volumes:
+#      - ${APP_PATH}:/var/www
+#      - ./supervisor/supervisord.d:/etc/supervisord.d
+#    tty: true
+#    networks:
+#      - network
 
   ### workspace (for tinkering)  ##########################################
   workspace:

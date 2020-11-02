@@ -14,6 +14,11 @@ class CourierApi extends BaseApi
         parent::__construct(env('COURIER_API_URL'));
     }
 
+    public static function instance()
+    {
+        return app()->make(self::class);
+    }
+
     public function sendMessage($cell, $message)
     {
         $endPoint = 'sms';
@@ -22,12 +27,14 @@ class CourierApi extends BaseApi
             'cell-number' => $cell,
             'message' => $message
         ];
-        $headers = [
-            'token' => env('NOTIFICATION_API_TOKEN')
+        $options = [
+            'headers' => [
+                'token' => env('NOTIFICATION_API_TOKEN')
+            ]
         ];
         return json_decode(
             $this->getResponseContent(
-                $this->call($method, $endPoint, $params, $headers)
+                $this->call($method, $endPoint, $params, $options)
             ), true
         );
     }

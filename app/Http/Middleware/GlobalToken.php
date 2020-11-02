@@ -17,7 +17,7 @@ class GlobalToken
     public function handle(Request $request, Closure $next)
     {
 
-        if(!$request->header('token') == env('GLOBAL_TOKEN')){
+        if(!$request->header('token') == env('NOTIFICATION_API_TOKEN')){
             return response('Unauthenticated', 401);
         }
         return $next($request);

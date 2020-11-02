@@ -15,7 +15,7 @@ class ExampleTest extends TestCase
     public function testBasicTest()
     {
         $response = $this->get('/',
-            ['token' => env('GLOBAL_TOKEN')]
+            ['token' => env('NOTIFICATION_API_TOKEN')]
         );
 
         $response->assertStatus(200);

@@ -4,7 +4,6 @@ services:
 
   ### Reverse Proxy  ##########################################
   proxy:
-    restart: always
     build:
       context: ${DOCKER_PATH}/proxy
       args:

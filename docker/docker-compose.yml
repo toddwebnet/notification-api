@@ -4,6 +4,7 @@ services:
 
   ### Reverse Proxy  ##########################################
   proxy:
+    restart: always
     build:
       context: ${DOCKER_PATH}/proxy
       args:
@@ -26,6 +27,7 @@ services:
 
   ### adminer develpment tools  ##########################################
   adminer:
+    restart: always
     image: adminer
     environment:
       - ADMINER_DEFAULT_SERVER=mysql
@@ -58,6 +60,7 @@ services:
 
   ### workspace (for tinkering)  ##########################################
   workspace:
+    restart: always
     build:
       context: ${DOCKER_PATH}/workspace
       args:
@@ -70,6 +73,7 @@ services:
       - network
 
   notiications-api:
+    restart: always
     build:
       context: ${DOCKER_PATH}/nginx
       args:
@@ -87,6 +91,7 @@ services:
       - network
 
   php-fpm:
+    restart: always
     build:
       context: ${DOCKER_PATH}/php-fpm
       args:
@@ -101,6 +106,7 @@ services:
 
   ### MySQL ################################################
   mysql:
+    restart: always
     build:
       context: ${DOCKER_PATH}/mysql
       args:
